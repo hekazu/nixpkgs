@@ -9,6 +9,8 @@
   libx11,
   libxcursor,
   libxi,
+  vulkan-headers,
+  vulkan-loader,
 }:
 let
   linkLibPath = lib.makeLibraryPath [
@@ -18,6 +20,8 @@ let
     libx11
     libxcursor
     libxi
+    vulkan-headers
+    vulkan-loader
   ];
 in
 rustPlatform.buildRustPackage (finalAttrs: {
