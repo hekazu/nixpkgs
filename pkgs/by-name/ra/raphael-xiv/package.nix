@@ -45,7 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ];
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    patchelf --set-rpath "${linkLibPath}" "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}"
+    patchelf --add-rpath "${linkLibPath}" "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}"
   '';
 
   meta = {
