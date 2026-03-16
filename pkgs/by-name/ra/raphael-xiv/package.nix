@@ -9,8 +9,8 @@
   libx11,
   libxcursor,
   libxi,
-  vulkan-headers,
   vulkan-loader,
+  makeBinaryWrapper,
 }:
 let
   linkLibPath = lib.makeLibraryPath [
@@ -20,7 +20,6 @@ let
     libx11
     libxcursor
     libxi
-    vulkan-headers
     vulkan-loader
   ];
 in
@@ -44,9 +43,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "raphael-cli"
   ];
 
+  nativeBuildInputs = [
+    makeBinaryWrapper
+  ];
+
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    patchelf --add-rpath "${linkLibPath}" "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}"
+    wrapProgram "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}" \
+      --prefix LD_LIBRARY_PATH : "${linkLibPath}"
   '';
+#    patchelf --add-rpath "${linkLibPath}" "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}"
 
   meta = {
     description = "Crafting macro solver for Final Fantasy XIV";
