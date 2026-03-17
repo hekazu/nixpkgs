@@ -44,6 +44,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   runtimeDependencies = [
     libxkbcommon
     libx11
+    libxcursor
     vulkan-loader
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
