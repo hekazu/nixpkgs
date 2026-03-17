@@ -45,6 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     libxkbcommon
     libx11
     libxcursor
+    libxi
     vulkan-loader
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
