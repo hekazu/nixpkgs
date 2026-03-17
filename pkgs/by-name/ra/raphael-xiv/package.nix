@@ -12,17 +12,6 @@
   vulkan-loader,
   makeBinaryWrapper,
 }:
-let
-  linkLibPath = lib.makeLibraryPath [
-    libGL
-    libxkbcommon
-    wayland
-    libx11
-    libxcursor
-    libxi
-    vulkan-loader
-  ];
-in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "raphael-xiv";
   version = "0.27.0";
@@ -36,6 +25,30 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-mua7YKU5Ujj8u3ZLI3y073JGRRN6dAUct+9YA4M8Ngk=";
 
+  nativeBuildInputs = [
+    makeBinaryWrapper
+  ];
+
+  buildInputs = [
+    libGL
+    libxkbcommon
+    libx11
+    libxcursor
+    libxi
+    vulkan-loader
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    wayland
+  ];
+
+  runtimeDependencies = [
+    libxkbcommon
+    vulkan-loader
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    wayland
+  ];
+
   cargoBuildFlags = [
     "--package"
     "raphael-xiv"
@@ -43,15 +56,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "raphael-cli"
   ];
 
-  nativeBuildInputs = [
-    makeBinaryWrapper
-  ];
-
-  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+  postFixup = ''
     wrapProgram "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}" \
-      --prefix LD_LIBRARY_PATH : "${linkLibPath}"
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath finalAttrs.runtimeDependencies}"
   '';
-#    patchelf --add-rpath "${linkLibPath}" "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}"
 
   meta = {
     description = "Crafting macro solver for Final Fantasy XIV";
